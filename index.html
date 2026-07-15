@@ -114,6 +114,7 @@
     </div>
   </header>
   <main>
+    <div class="filters" id="prodtabs" style="margin-top:14px"></div>
     <div class="kpis" id="kpis"></div>
 
     <div class="card2 alert hidden" id="alertCard">
@@ -138,6 +139,7 @@
         <button data-f="all" class="on">전체</button>
         <button data-f="mark">마킹</button>
         <button data-f="none">노마킹</button>
+        <button data-f="unchk">미검사</button>
         <button data-f="pub">미발행</button>
         <button data-f="issue">문제글</button>
       </div>
@@ -157,11 +159,11 @@
 
 <script>
 "use strict";
-const PRODUCT = "루마큐라";
-const DATA_URL = "data/" + encodeURIComponent(PRODUCT) + ".enc.json";
+const PRODUCTS = ["루마큐라","흑마늘정","스웨트린","베스타린","모스트린","미노렉스"];
 const $ = s => document.querySelector(s);
 const b64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
-let BUNDLE = null, ROWS = [];
+const dataUrl = p => "data/" + encodeURIComponent(p) + ".enc.json";
+let BUNDLES = {}, BUNDLE = null, ROWS = [], CURRENT = null;
 
 async function decrypt(enc, password){
   const km = await crypto.subtle.importKey("raw", new TextEncoder().encode(password), "PBKDF2", false, ["deriveKey"]);
@@ -175,14 +177,59 @@ function safeGet(k){ try{ return sessionStorage.getItem(k); }catch(e){ return nu
 function safeSet(k,v){ try{ sessionStorage.setItem(k,v); }catch(e){} }
 function safeDel(k){ try{ sessionStorage.removeItem(k); }catch(e){} }
 
-async function tryLogin(password, remember){
-  const res = await fetch(DATA_URL, {cache:"no-store"});
-  if(!res.ok) throw new Error("데이터 파일을 찾을 수 없습니다 (아직 업로드 전일 수 있어요).");
+async function loadProduct(p, password){
+  const res = await fetch(dataUrl(p), {cache:"no-store"});
+  if(!res.ok){ const e = new Error("NODATA"); e.nodata = true; throw e; }
   const enc = await res.json();
-  BUNDLE = await decrypt(enc, password);
-  if(remember) safeSet("luma_pw", password);
-  return BUNDLE;
+  return await decrypt(enc, password);
 }
+async function tryLogin(password, remember){
+  // 마지막에 보던 제품부터 시도, 데이터 없으면 다음 제품으로
+  const saved = safeGet("luma_prod");
+  const first = PRODUCTS.includes(saved) ? saved : PRODUCTS[0];
+  const order = [first, ...PRODUCTS.filter(p=>p!==first)];
+  for(const p of order){
+    try{
+      const b = await loadProduct(p, password);
+      BUNDLES[p] = b; CURRENT = p; BUNDLE = b;
+      safeSet("luma_prod", p);
+      if(remember) safeSet("luma_pw", password);
+      return b;
+    }catch(e){
+      if(e.nodata) continue;      // 파일 없음 → 다음 제품
+      throw e;                    // 복호화 실패 = 비밀번호 오류
+    }
+  }
+  throw new Error("데이터 파일을 찾을 수 없습니다 (아직 업로드 전일 수 있어요).");
+}
+function renderProdTabs(){
+  $("#prodtabs").innerHTML = PRODUCTS.map(p=>
+    `<button data-p="${esc(p)}" class="${p===CURRENT?"on":""}">${esc(p)}</button>`).join("");
+}
+async function switchProduct(p){
+  CURRENT = p; safeSet("luma_prod", p); renderProdTabs();
+  if(!BUNDLES[p]){
+    const pw = safeGet("luma_pw"); if(!pw) return location.reload();
+    try{ BUNDLES[p] = await loadProduct(p, pw); }
+    catch(e){
+      BUNDLE = null;
+      $("#title").textContent = p + " · 상위노출 모니터링";
+      $("#updated").textContent = "";
+      $("#kpis").innerHTML = "";
+      $("#alertCard").classList.add("hidden");
+      $("#chart").innerHTML = "";
+      $("#kwhint").textContent = "";
+      $("#kwbody").innerHTML = `<tr><td colspan="9" class="empty">${esc(p)}: 아직 업로드된 데이터가 없습니다. (시트업로드.bat 실행 후 새로고침)</td></tr>`;
+      $("#foot").textContent = "";
+      return;
+    }
+  }
+  BUNDLE = BUNDLES[p]; render();
+}
+document.addEventListener("click", e=>{
+  const btn = e.target.closest("#prodtabs button"); if(!btn) return;
+  if(btn.dataset.p !== CURRENT) switchProduct(btn.dataset.p);
+});
 async function submitLogin(){
   const pw = $("#pw").value; if(!pw) return;
   $("#go").disabled = true; $("#err").textContent = "";
@@ -199,7 +246,10 @@ $("#pw").addEventListener("keydown", e => { if(e.key==="Enter") submitLogin(); }
 $("#logout").addEventListener("click", () => { safeDel("luma_pw"); location.reload(); });
 $("#reload").addEventListener("click", async () => {
   const pw = safeGet("luma_pw"); if(!pw) return location.reload();
-  try{ await tryLogin(pw, false); render(); }catch(e){ location.reload(); }
+  try{
+    BUNDLES[CURRENT] = await loadProduct(CURRENT, pw);
+    BUNDLE = BUNDLES[CURRENT]; render();
+  }catch(e){ location.reload(); }
 });
 
 function applyTheme(t){
@@ -218,14 +268,16 @@ function d(s){ return (s==null||s==="") ? '<span class="dash">—</span>' : esc(
 function buildRows(kws){
   const out=[];
   kws.forEach(k=>{
-    const marked=(k.foundNorms||[]).length>0;
+    const kwChecked=Array.isArray(k.foundNorms);      // 크롤 검사를 거친 키워드인가
+    const marked=kwChecked && k.foundNorms.length>0;
     const links=k.links||[];
     if(links.length===0){
-      out.push({kw:k.kw, vol:k.vol, cafe:"", writer:"", date:"", tab:false, marked:false, rank:"", active:"", url:"", pub:true});
+      out.push({kw:k.kw, vol:k.vol, cafe:"", writer:"", date:"", tab:false, marked:false, rank:"", active:"", url:"", pub:true, checked:kwChecked});
     }else{
       links.forEach(l=>{
+        const rowChecked = l.marked===true || l.marked===false;   // null=미검사
         out.push({kw:k.kw, vol:k.vol, cafe:l.cafe, writer:l.writer||l.manager, date:l.date,
-          marked:!!l.marked, rank:l.rankSheet, active:l.active, hasLink:true,
+          marked:l.marked===true, checked:rowChecked, rank:l.rankSheet, active:l.active, hasLink:true,
           url:l.urlResolved||l.url, pub:false, kwMarked:marked});
       });
     }
@@ -236,27 +288,31 @@ function buildRows(kws){
 function render(){
   const b=BUNDLE, L=b.latest||{}, kws=L.keywords||[];
   ROWS=buildRows(kws);
-  $("#title").textContent=(b.product||PRODUCT)+" · 상위노출 모니터링";
-  $("#updated").textContent="업데이트 "+(b.updatedAt||L.checkedAt||"")+" · 검사일 "+(L.checkedAt||"");
+  renderProdTabs();
+  $("#title").textContent=(b.product||CURRENT)+" · 상위노출 모니터링";
+  $("#updated").textContent="시트 동기화 "+(b.sheetSyncedAt||b.updatedAt||"")+" · 마지막 검사 "+(L.checkedAt||"아직 없음");
 
   const total=kws.length;
-  const marked=kws.filter(k=>(k.foundNorms||[]).length>0).length;
+  const checkedK=kws.filter(k=>Array.isArray(k.foundNorms));
+  const marked=checkedK.filter(k=>k.foundNorms.length>0).length;
   const hasLink=kws.filter(k=>(k.links||[]).length>0).length;
-  const noMark=hasLink-marked;
   const pub=total-hasLink;
-  const rate=total?Math.round(marked/total*100):0;
+  const noMark=checkedK.filter(k=>(k.links||[]).length>0 && k.foundNorms.length===0).length;
+  const unchecked=kws.filter(k=>(k.links||[]).length>0 && !Array.isArray(k.foundNorms)).length;
+  const rate=checkedK.length?Math.round(marked/checkedK.length*100):0;
   const deleted=ROWS.filter(r=>r.active==="삭제됨").length;
   const member=ROWS.filter(r=>r.active==="회원전용").length;
   const kpis=[
-    {label:"전체 키워드", val:total, sub:"이번 회차"},
-    {label:"마킹", val:marked, sub:`마킹률 ${rate}%`, cls:"good"},
+    {label:"전체 키워드", val:total, sub:`검사완료 ${checkedK.length}개`},
+    {label:"마킹", val:marked, sub:`검사분 대비 ${rate}%`, cls:"good"},
     {label:"노마킹", val:noMark, sub:"발행했으나 미노출"},
+    {label:"미검사", val:unchecked, sub:"크롤 검사 대기", cls:unchecked?"warn":""},
     {label:"미발행", val:pub, sub:"작업 링크 없음"},
     {label:"삭제 감지", val:deleted, sub:"활성 아님", cls:deleted?"crit":""},
     {label:"회원전용", val:member, sub:"열람 제한", cls:member?"warn":""},
   ];
   $("#kpis").innerHTML=kpis.map(k=>`<div class="kpi"><div class="label">${k.label}</div><div class="val ${k.cls||""}">${k.val}</div><div class="sub">${k.sub}</div></div>`).join("");
-  $("#kwhint").textContent=`총 ${total}개 키워드 · 마킹 ${marked} · 노마킹 ${noMark} · 미발행 ${pub}`;
+  $("#kwhint").textContent=`총 ${total}개 키워드 · 마킹 ${marked} · 노마킹 ${noMark} · 미검사 ${unchecked} · 미발행 ${pub}`;
   $("#foot").textContent=`데이터는 암호화 저장됩니다 · ${b.product||PRODUCT} · 최근 이력 ${(b.history||[]).length}회`;
 
   renderKw(); renderAlert(); drawChart();
@@ -270,6 +326,7 @@ function statusCell(r){
 }
 function tkCell(r){
   if(r.pub) return '<span class="badge b-pub">미발행</span>';
+  if(!r.checked) return '<span class="badge b-unk">미검사</span>';
   return r.marked ? '<span class="badge b-mark">마킹</span>' : '<span class="badge b-none">노마킹</span>';
 }
 function linkCell(r){ return r.url ? `<a href="${esc(r.url)}" target="_blank" rel="noopener">🔗 열기</a>` : '<span class="dash">—</span>'; }
@@ -279,7 +336,8 @@ function renderKw(){
   const rows=ROWS.filter(r=>{
     if(kwFilter==="all") return true;
     if(kwFilter==="mark") return r.marked;
-    if(kwFilter==="none") return r.hasLink && !r.marked;
+    if(kwFilter==="none") return r.hasLink && r.checked && !r.marked;
+    if(kwFilter==="unchk") return r.hasLink && !r.checked;
     if(kwFilter==="pub") return r.pub;
     if(kwFilter==="issue") return r.active==="삭제됨"||r.active==="회원전용";
     return true;
