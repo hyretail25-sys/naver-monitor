@@ -33,81 +33,60 @@
     font-family:system-ui,-apple-system,"Segoe UI","Malgun Gothic",sans-serif;
     font-size:15px; line-height:1.5;
   }
-  /* ── 로그인 ── */
-  #gate{
-    position:fixed; inset:0; background:var(--plane);
-    display:flex; align-items:center; justify-content:center; z-index:50; padding:24px;
-  }
-  #gate .card{
-    background:var(--surface); border:1px solid var(--border); border-radius:16px;
-    padding:32px 28px; width:100%; max-width:360px; text-align:center;
-    box-shadow:0 8px 40px rgba(0,0,0,0.08);
-  }
+  #gate{position:fixed; inset:0; background:var(--plane); display:flex; align-items:center; justify-content:center; z-index:50; padding:24px}
+  #gate .card{background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:32px 28px; width:100%; max-width:360px; text-align:center; box-shadow:0 8px 40px rgba(0,0,0,0.08)}
   #gate h1{font-size:18px; margin:0 0 4px}
   #gate p{color:var(--ink2); font-size:13px; margin:0 0 20px}
-  #gate input{
-    width:100%; padding:12px 14px; font-size:15px; border-radius:10px;
-    border:1px solid var(--axis); background:var(--plane); color:var(--ink); margin-bottom:12px;
-  }
-  #gate button{
-    width:100%; padding:12px; font-size:15px; font-weight:600; border:none; border-radius:10px;
-    background:var(--series); color:#fff; cursor:pointer;
-  }
+  #gate input{width:100%; padding:12px 14px; font-size:15px; border-radius:10px; border:1px solid var(--axis); background:var(--plane); color:var(--ink); margin-bottom:12px}
+  #gate button{width:100%; padding:12px; font-size:15px; font-weight:600; border:none; border-radius:10px; background:var(--series); color:#fff; cursor:pointer}
   #gate button:disabled{opacity:.6; cursor:default}
   #gate .err{color:var(--critical); font-size:13px; min-height:18px; margin-top:10px}
   .hidden{display:none !important}
-  /* ── 레이아웃 ── */
-  header{
-    max-width:1100px; margin:0 auto; padding:22px 20px 8px;
-    display:flex; align-items:baseline; justify-content:space-between; gap:12px; flex-wrap:wrap;
-  }
+  header{max-width:1180px; margin:0 auto; padding:22px 20px 8px; display:flex; align-items:baseline; justify-content:space-between; gap:12px; flex-wrap:wrap}
   header h1{font-size:19px; margin:0}
   header .meta{color:var(--muted); font-size:13px}
   .tools{display:flex; gap:8px}
-  .tools button{
-    background:var(--surface); border:1px solid var(--border); color:var(--ink2);
-    border-radius:8px; padding:6px 12px; font-size:13px; cursor:pointer;
-  }
-  main{max-width:1100px; margin:0 auto; padding:8px 20px 60px}
-  /* ── KPI ── */
-  .kpis{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin:16px 0 24px}
+  .tools button{background:var(--surface); border:1px solid var(--border); color:var(--ink2); border-radius:8px; padding:6px 12px; font-size:13px; cursor:pointer}
+  main{max-width:1180px; margin:0 auto; padding:8px 20px 60px}
+  .kpis{display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:12px; margin:16px 0 24px}
   .kpi{background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:16px}
   .kpi .label{font-size:12px; color:var(--muted); margin-bottom:6px}
   .kpi .val{font-size:30px; font-weight:700; letter-spacing:-.02em; font-variant-numeric:tabular-nums}
   .kpi .sub{font-size:12px; color:var(--ink2); margin-top:2px}
-  .kpi .val.good{color:var(--good-ink)} .kpi .val.crit{color:var(--critical)}
-  /* ── 카드 ── */
+  .kpi .val.good{color:var(--good-ink)} .kpi .val.crit{color:var(--critical)} .kpi .val.warn{color:#8a6100}
+  :root[data-theme="dark"] .kpi .val.warn{color:#fab219}
   .card2{background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:18px 18px 8px; margin-bottom:22px}
   .card2 h2{font-size:14px; margin:0 0 4px}
   .card2 .hint{font-size:12px; color:var(--muted); margin:0 0 12px}
-  /* ── 차트 ── */
-  #chart{width:100%; height:230px; display:block}
-  .tip{
-    position:fixed; pointer-events:none; background:var(--ink); color:var(--surface);
-    padding:6px 9px; border-radius:7px; font-size:12px; opacity:0; transition:opacity .1s; z-index:20;
-    white-space:nowrap;
-  }
-  /* ── 테이블 ── */
-  table{width:100%; border-collapse:collapse; font-size:14px}
-  th,td{text-align:left; padding:9px 10px; border-bottom:1px solid var(--grid)}
+  #chart{width:100%; height:210px; display:block}
+  .tip{position:fixed; pointer-events:none; background:var(--ink); color:var(--surface); padding:6px 9px; border-radius:7px; font-size:12px; opacity:0; transition:opacity .1s; z-index:20; white-space:nowrap}
+  .tbl-wrap{overflow-x:auto}
+  table{width:100%; border-collapse:collapse; font-size:14px; min-width:820px}
+  th,td{text-align:left; padding:9px 10px; border-bottom:1px solid var(--grid); white-space:nowrap}
   th{font-size:12px; color:var(--muted); font-weight:600}
   tbody tr:hover{background:var(--chip)}
   td.num{text-align:right; font-variant-numeric:tabular-nums}
+  td.kw{white-space:normal; font-weight:600; min-width:120px}
+  td.cafe{white-space:normal; max-width:200px; color:var(--ink2)}
   a{color:var(--series); text-decoration:none} a:hover{text-decoration:underline}
   .badge{display:inline-flex; align-items:center; gap:5px; font-size:12px; font-weight:600; padding:2px 9px; border-radius:20px}
   .badge::before{content:""; width:7px; height:7px; border-radius:50%}
   .b-mark{background:rgba(12,163,12,.12); color:var(--good-ink)} .b-mark::before{background:var(--good)}
   .b-none{background:var(--chip); color:var(--ink2)} .b-none::before{background:var(--muted)}
+  .b-pub{background:var(--chip); color:var(--muted); opacity:.85} .b-pub::before{background:var(--axis)}
   .b-good{background:rgba(12,163,12,.12); color:var(--good-ink)} .b-good::before{background:var(--good)}
   .b-del{background:rgba(208,59,59,.12); color:var(--critical)} .b-del::before{background:var(--critical)}
   .b-mem{background:rgba(250,178,25,.15); color:#8a6100} .b-mem::before{background:var(--warning)}
   .b-unk{background:var(--chip); color:var(--ink2)} .b-unk::before{background:var(--muted)}
   :root[data-theme="dark"] .b-mem{color:#fab219}
+  .dash{color:var(--muted)}
   .filters{display:flex; gap:6px; margin-bottom:12px; flex-wrap:wrap}
   .filters button{background:var(--plane); border:1px solid var(--border); color:var(--ink2); border-radius:20px; padding:4px 13px; font-size:13px; cursor:pointer}
   .filters button.on{background:var(--series); color:#fff; border-color:var(--series)}
   .empty{color:var(--muted); font-size:13px; padding:16px 10px}
-  footer{max-width:1100px; margin:0 auto; padding:0 20px 40px; color:var(--muted); font-size:12px}
+  .alert{background:rgba(208,59,59,.06); border:1px solid rgba(208,59,59,.25)}
+  :root[data-theme="dark"] .alert{background:rgba(208,59,59,.10)}
+  footer{max-width:1180px; margin:0 auto; padding:0 20px 40px; color:var(--muted); font-size:12px}
 </style>
 </head>
 <body>
@@ -137,6 +116,15 @@
   <main>
     <div class="kpis" id="kpis"></div>
 
+    <div class="card2 alert hidden" id="alertCard">
+      <h2 style="color:var(--critical)">⚠ 주의가 필요한 글</h2>
+      <p class="hint">삭제되었거나 회원전용으로 막혀 통검 유입이 안 되는 글입니다.</p>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>키워드</th><th>카페</th><th>상태</th><th>링크</th></tr></thead>
+        <tbody id="alertBody"></tbody>
+      </table></div>
+    </div>
+
     <div class="card2">
       <h2>마킹 수 추이</h2>
       <p class="hint">실행 회차별로 통합검색에 노출(마킹)된 키워드 수입니다.</p>
@@ -144,33 +132,22 @@
     </div>
 
     <div class="card2">
-      <h2>키워드 현황</h2>
+      <h2>키워드별 현황</h2>
       <p class="hint" id="kwhint"></p>
       <div class="filters" id="kwfilters">
         <button data-f="all" class="on">전체</button>
         <button data-f="mark">마킹</button>
         <button data-f="none">노마킹</button>
+        <button data-f="pub">미발행</button>
+        <button data-f="issue">문제글</button>
       </div>
-      <table>
-        <thead><tr><th>키워드</th><th>상태</th><th class="num">노출 링크</th></tr></thead>
+      <div class="tbl-wrap"><table>
+        <thead><tr>
+          <th>키워드</th><th class="num">검색량</th><th>카페</th><th>작업자</th><th>발행일</th>
+          <th>통검</th><th>카페탭</th><th>글 상태</th><th>링크</th>
+        </tr></thead>
         <tbody id="kwbody"></tbody>
-      </table>
-    </div>
-
-    <div class="card2">
-      <h2>우리 글 상태</h2>
-      <p class="hint">마킹된 글의 삭제·회원전용 여부입니다.</p>
-      <div class="filters" id="lnfilters">
-        <button data-f="all" class="on">전체</button>
-        <button data-f="활성">활성</button>
-        <button data-f="삭제됨">삭제됨</button>
-        <button data-f="회원전용">회원전용</button>
-        <button data-f="미확인">미확인</button>
-      </div>
-      <table>
-        <thead><tr><th>글 링크</th><th>상태</th></tr></thead>
-        <tbody id="lnbody"></tbody>
-      </table>
+      </table></div>
     </div>
   </main>
   <footer id="foot"></footer>
@@ -180,13 +157,12 @@
 
 <script>
 "use strict";
-const PRODUCT = "루마큐라";                 // data/<이름>.enc.json 을 읽습니다
+const PRODUCT = "루마큐라";
 const DATA_URL = "data/" + encodeURIComponent(PRODUCT) + ".enc.json";
 const $ = s => document.querySelector(s);
 const b64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
-let BUNDLE = null;
+let BUNDLE = null, ROWS = [];
 
-// ── 복호화 (push_dashboard.py 의 AES-256-GCM 과 호환) ──
 async function decrypt(enc, password){
   const km = await crypto.subtle.importKey("raw", new TextEncoder().encode(password), "PBKDF2", false, ["deriveKey"]);
   const key = await crypto.subtle.deriveKey(
@@ -195,7 +171,6 @@ async function decrypt(enc, password){
   const pt = await crypto.subtle.decrypt({name:"AES-GCM", iv:b64(enc.iv)}, key, b64(enc.ct));
   return JSON.parse(new TextDecoder().decode(pt));
 }
-
 function safeGet(k){ try{ return sessionStorage.getItem(k); }catch(e){ return null; } }
 function safeSet(k,v){ try{ sessionStorage.setItem(k,v); }catch(e){} }
 function safeDel(k){ try{ sessionStorage.removeItem(k); }catch(e){} }
@@ -204,29 +179,20 @@ async function tryLogin(password, remember){
   const res = await fetch(DATA_URL, {cache:"no-store"});
   if(!res.ok) throw new Error("데이터 파일을 찾을 수 없습니다 (아직 업로드 전일 수 있어요).");
   const enc = await res.json();
-  const bundle = await decrypt(enc, password);   // 비번 틀리면 여기서 예외
-  BUNDLE = bundle;
+  BUNDLE = await decrypt(enc, password);
   if(remember) safeSet("luma_pw", password);
-  return bundle;
+  return BUNDLE;
 }
-
-// ── 로그인 UI ──
 async function submitLogin(){
-  const pw = $("#pw").value;
-  if(!pw) return;
+  const pw = $("#pw").value; if(!pw) return;
   $("#go").disabled = true; $("#err").textContent = "";
   try{
     await tryLogin(pw, true);
-    $("#gate").classList.add("hidden");
-    $("#app").classList.remove("hidden");
-    render();
+    $("#gate").classList.add("hidden"); $("#app").classList.remove("hidden"); render();
   }catch(e){
-    const msg = /찾을 수 없/.test(e.message) ? e.message : "비밀번호가 틀렸습니다.";
-    $("#err").textContent = msg;
+    $("#err").textContent = /찾을 수 없/.test(e.message) ? e.message : "비밀번호가 틀렸습니다.";
     safeDel("luma_pw");
-  }finally{
-    $("#go").disabled = false;
-  }
+  }finally{ $("#go").disabled = false; }
 }
 $("#go").addEventListener("click", submitLogin);
 $("#pw").addEventListener("keydown", e => { if(e.key==="Enter") submitLogin(); });
@@ -236,150 +202,160 @@ $("#reload").addEventListener("click", async () => {
   try{ await tryLogin(pw, false); render(); }catch(e){ location.reload(); }
 });
 
-// ── 테마 ──
 function applyTheme(t){
   document.documentElement.setAttribute("data-theme", t);
   $("#theme").textContent = t==="dark" ? "☀️ 라이트" : "🌙 다크";
   safeSet("luma_theme", t);
   if(BUNDLE) drawChart();
 }
-$("#theme").addEventListener("click", () => {
-  applyTheme(document.documentElement.getAttribute("data-theme")==="dark" ? "light" : "dark");
-});
+$("#theme").addEventListener("click", () => applyTheme(document.documentElement.getAttribute("data-theme")==="dark"?"light":"dark"));
 applyTheme(safeGet("luma_theme") || "light");
 
-// ── 렌더 ──
-function esc(s){ return String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+function d(s){ return (s==null||s==="") ? '<span class="dash">—</span>' : esc(s); }
 
-function render(){
-  const b = BUNDLE, L = b.latest || {};
-  const kws = L.keywords || [], links = L.links || [];
-  $("#title").textContent = (b.product||PRODUCT) + " · 상위노출 모니터링";
-  $("#updated").textContent = "업데이트 " + (b.updatedAt||L.checkedAt||"") + " · 검사일 " + (L.checkedAt||"");
-
-  const total = kws.length;
-  const marked = kws.filter(k => (k.foundNorms||[]).length>0).length;
-  const rate = total ? Math.round(marked/total*100) : 0;
-  const deleted = links.filter(l => l.active==="삭제됨").length;
-  const member = links.filter(l => l.active==="회원전용").length;
-  const kpis = [
-    {label:"전체 키워드", val:total, sub:"이번 회차 검사"},
-    {label:"마킹", val:marked, sub:`마킹률 ${rate}%`, cls:"good"},
-    {label:"노마킹", val:total-marked, sub:"통검 미노출"},
-    {label:"삭제 감지", val:deleted, sub:"활성 아님", cls: deleted?"crit":""},
-    {label:"회원전용", val:member, sub:"열람 제한"},
-  ];
-  $("#kpis").innerHTML = kpis.map(k =>
-    `<div class="kpi"><div class="label">${k.label}</div><div class="val ${k.cls||""}">${k.val}</div><div class="sub">${k.sub}</div></div>`
-  ).join("");
-
-  renderKw(kws); renderLn(links); drawChart();
-  $("#kwhint").textContent = `총 ${total}개 키워드 중 ${marked}개가 통합검색에 노출 중입니다.`;
-  $("#foot").textContent = `데이터는 암호화되어 저장됩니다 · ${b.product||PRODUCT} · 최근 이력 ${(b.history||[]).length}회`;
+// 키워드[]→ 행[] 평탄화 (키워드당 링크 1개 이상, 없으면 빈 행 1개)
+function buildRows(kws){
+  const out=[];
+  kws.forEach(k=>{
+    const marked=(k.foundNorms||[]).length>0;
+    const links=k.links||[];
+    if(links.length===0){
+      out.push({kw:k.kw, vol:k.vol, cafe:"", writer:"", date:"", tab:false, marked:false, rank:"", active:"", url:"", pub:true});
+    }else{
+      links.forEach(l=>{
+        out.push({kw:k.kw, vol:k.vol, cafe:l.cafe, writer:l.writer||l.manager, date:l.date,
+          marked:!!l.marked, rank:l.rankSheet, active:l.active, hasLink:true,
+          url:l.urlResolved||l.url, pub:false, kwMarked:marked});
+      });
+    }
+  });
+  return out;
 }
 
+function render(){
+  const b=BUNDLE, L=b.latest||{}, kws=L.keywords||[];
+  ROWS=buildRows(kws);
+  $("#title").textContent=(b.product||PRODUCT)+" · 상위노출 모니터링";
+  $("#updated").textContent="업데이트 "+(b.updatedAt||L.checkedAt||"")+" · 검사일 "+(L.checkedAt||"");
+
+  const total=kws.length;
+  const marked=kws.filter(k=>(k.foundNorms||[]).length>0).length;
+  const hasLink=kws.filter(k=>(k.links||[]).length>0).length;
+  const noMark=hasLink-marked;
+  const pub=total-hasLink;
+  const rate=total?Math.round(marked/total*100):0;
+  const deleted=ROWS.filter(r=>r.active==="삭제됨").length;
+  const member=ROWS.filter(r=>r.active==="회원전용").length;
+  const kpis=[
+    {label:"전체 키워드", val:total, sub:"이번 회차"},
+    {label:"마킹", val:marked, sub:`마킹률 ${rate}%`, cls:"good"},
+    {label:"노마킹", val:noMark, sub:"발행했으나 미노출"},
+    {label:"미발행", val:pub, sub:"작업 링크 없음"},
+    {label:"삭제 감지", val:deleted, sub:"활성 아님", cls:deleted?"crit":""},
+    {label:"회원전용", val:member, sub:"열람 제한", cls:member?"warn":""},
+  ];
+  $("#kpis").innerHTML=kpis.map(k=>`<div class="kpi"><div class="label">${k.label}</div><div class="val ${k.cls||""}">${k.val}</div><div class="sub">${k.sub}</div></div>`).join("");
+  $("#kwhint").textContent=`총 ${total}개 키워드 · 마킹 ${marked} · 노마킹 ${noMark} · 미발행 ${pub}`;
+  $("#foot").textContent=`데이터는 암호화 저장됩니다 · ${b.product||PRODUCT} · 최근 이력 ${(b.history||[]).length}회`;
+
+  renderKw(); renderAlert(); drawChart();
+}
+
+const BADGE={"활성":"b-good","삭제됨":"b-del","회원전용":"b-mem","미확인":"b-unk"};
+function statusCell(r){
+  if(!r.hasLink) return '<span class="dash">—</span>';
+  if(!r.active) return '<span class="dash">미검사</span>';
+  return `<span class="badge ${BADGE[r.active]||"b-unk"}">${esc(r.active)}</span>`;
+}
+function tkCell(r){
+  if(r.pub) return '<span class="badge b-pub">미발행</span>';
+  return r.marked ? '<span class="badge b-mark">마킹</span>' : '<span class="badge b-none">노마킹</span>';
+}
+function linkCell(r){ return r.url ? `<a href="${esc(r.url)}" target="_blank" rel="noopener">🔗 열기</a>` : '<span class="dash">—</span>'; }
+
 let kwFilter="all";
-function renderKw(kws){
-  const rows = kws.filter(k=>{
-    const m=(k.foundNorms||[]).length>0;
-    return kwFilter==="all" || (kwFilter==="mark"&&m) || (kwFilter==="none"&&!m);
+function renderKw(){
+  const rows=ROWS.filter(r=>{
+    if(kwFilter==="all") return true;
+    if(kwFilter==="mark") return r.marked;
+    if(kwFilter==="none") return r.hasLink && !r.marked;
+    if(kwFilter==="pub") return r.pub;
+    if(kwFilter==="issue") return r.active==="삭제됨"||r.active==="회원전용";
+    return true;
   });
-  $("#kwbody").innerHTML = rows.length ? rows.map(k=>{
-    const n=(k.foundNorms||[]).length, m=n>0;
-    return `<tr><td>${esc(k.kw)}</td><td>${m?'<span class="badge b-mark">마킹</span>':'<span class="badge b-none">노마킹</span>'}</td><td class="num">${n||"—"}</td></tr>`;
-  }).join("") : `<tr><td colspan="3" class="empty">해당 항목이 없습니다.</td></tr>`;
+  $("#kwbody").innerHTML = rows.length ? rows.map(r=>`<tr>
+    <td class="kw">${esc(r.kw)}</td>
+    <td class="num">${r.vol!=null?r.vol.toLocaleString():'<span class="dash">—</span>'}</td>
+    <td class="cafe">${d(r.cafe)}</td>
+    <td>${d(r.writer)}</td>
+    <td>${d(r.date)}</td>
+    <td>${tkCell(r)}</td>
+    <td class="num">${d(r.rank)}</td>
+    <td>${statusCell(r)}</td>
+    <td>${linkCell(r)}</td>
+  </tr>`).join("") : `<tr><td colspan="9" class="empty">해당 항목이 없습니다.</td></tr>`;
 }
 $("#kwfilters").addEventListener("click", e=>{
   const btn=e.target.closest("button"); if(!btn) return;
   kwFilter=btn.dataset.f;
   [...$("#kwfilters").children].forEach(x=>x.classList.toggle("on",x===btn));
-  renderKw((BUNDLE.latest||{}).keywords||[]);
+  renderKw();
 });
 
-const BADGE = {"활성":"b-good","삭제됨":"b-del","회원전용":"b-mem","미확인":"b-unk"};
-let lnFilter="all";
-function renderLn(links){
-  const rows = links.filter(l => lnFilter==="all" || l.active===lnFilter);
-  $("#lnbody").innerHTML = rows.length ? rows.map(l=>{
-    const cls=BADGE[l.active]||"b-unk";
-    return `<tr><td><a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.norm||l.url)}</a></td><td><span class="badge ${cls}">${esc(l.active)}</span></td></tr>`;
-  }).join("") : `<tr><td colspan="2" class="empty">해당 항목이 없습니다.</td></tr>`;
+function renderAlert(){
+  const bad=ROWS.filter(r=>r.active==="삭제됨"||r.active==="회원전용");
+  if(!bad.length){ $("#alertCard").classList.add("hidden"); return; }
+  $("#alertCard").classList.remove("hidden");
+  $("#alertBody").innerHTML=bad.map(r=>`<tr>
+    <td class="kw">${esc(r.kw)}</td><td class="cafe">${d(r.cafe)}</td>
+    <td>${statusCell(r)}</td><td>${linkCell(r)}</td></tr>`).join("");
 }
-$("#lnfilters").addEventListener("click", e=>{
-  const btn=e.target.closest("button"); if(!btn) return;
-  lnFilter=btn.dataset.f;
-  [...$("#lnfilters").children].forEach(x=>x.classList.toggle("on",x===btn));
-  renderLn((BUNDLE.latest||{}).links||[]);
-});
 
-// ── 마킹 추이 라인차트 (인라인 SVG) ──
 function cssv(n){ return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
 function drawChart(){
-  const hist = (BUNDLE.history||[]).slice();
-  const svg = $("#chart");
-  const W = svg.clientWidth || 900, H = 230;
-  const pad = {t:16,r:16,b:28,l:34};
+  const hist=(BUNDLE.history||[]).slice();
+  const svg=$("#chart"); const W=svg.clientWidth||900, H=210;
+  const pad={t:16,r:16,b:28,l:34};
   svg.setAttribute("viewBox",`0 0 ${W} ${H}`);
-  const NS="http://www.w3.org/2000/svg";
-  svg.innerHTML="";
+  const NS="http://www.w3.org/2000/svg"; svg.innerHTML="";
   if(hist.length===0){
     const t=document.createElementNS(NS,"text");
     t.setAttribute("x",W/2); t.setAttribute("y",H/2); t.setAttribute("text-anchor","middle");
     t.setAttribute("fill",cssv("--muted")); t.setAttribute("font-size","13");
     t.textContent="이력이 아직 없습니다 (2회차부터 추이가 그려집니다)."; svg.appendChild(t); return;
   }
-  const pts = hist.map((h,i)=>({i, y:h.marked||0, label:h.checkedAt||h.stamp||("#"+(i+1)), del:h.deletedLinks||0, tot:h.keywords||0}));
-  const maxY = Math.max(4, ...pts.map(p=>p.y));
+  const pts=hist.map((h,i)=>({i,y:h.marked||0,label:h.checkedAt||h.stamp||("#"+(i+1)),del:h.deletedLinks||0,tot:h.keywords||0}));
+  const maxY=Math.max(4,...pts.map(p=>p.y));
   const plotW=W-pad.l-pad.r, plotH=H-pad.t-pad.b;
-  const X = i => pad.l + (pts.length<=1 ? plotW/2 : plotW*i/(pts.length-1));
-  const Y = v => pad.t + plotH*(1-v/maxY);
+  const X=i=>pad.l+(pts.length<=1?plotW/2:plotW*i/(pts.length-1));
+  const Y=v=>pad.t+plotH*(1-v/maxY);
   const mk=(tag,at)=>{const e=document.createElementNS(NS,tag);for(const k in at)e.setAttribute(k,at[k]);return e;};
-
-  // 그리드 + y눈금
   const ticks=4;
   for(let t=0;t<=ticks;t++){
     const v=Math.round(maxY*t/ticks), y=Y(v);
     svg.appendChild(mk("line",{x1:pad.l,y1:y,x2:W-pad.r,y2:y,stroke:cssv("--grid"),"stroke-width":1}));
     const lb=mk("text",{x:pad.l-6,y:y+3,"text-anchor":"end",fill:cssv("--muted"),"font-size":11}); lb.textContent=v; svg.appendChild(lb);
   }
-  // area
-  const line = pts.map(p=>`${X(p.i)},${Y(p.y)}`).join(" ");
-  const area = `${pad.l},${Y(0)} ${line} ${X(pts.length-1)},${Y(0)}`;
-  svg.appendChild(mk("polygon",{points:area, fill:cssv("--series"), opacity:0.08}));
+  const line=pts.map(p=>`${X(p.i)},${Y(p.y)}`).join(" ");
+  svg.appendChild(mk("polygon",{points:`${pad.l},${Y(0)} ${line} ${X(pts.length-1)},${Y(0)}`, fill:cssv("--series"), opacity:0.08}));
   svg.appendChild(mk("polyline",{points:line, fill:"none", stroke:cssv("--series"),"stroke-width":2,"stroke-linejoin":"round","stroke-linecap":"round"}));
-  // x라벨 (처음/중간/끝만)
-  const showIdx = pts.length<=6 ? pts.map(p=>p.i) : [0, Math.floor((pts.length-1)/2), pts.length-1];
-  pts.forEach(p=>{
-    if(showIdx.includes(p.i)){
-      const lb=mk("text",{x:X(p.i),y:H-8,"text-anchor":"middle",fill:cssv("--muted"),"font-size":11});
-      lb.textContent=String(p.label).slice(5); svg.appendChild(lb);
-    }
-  });
-  // 마커 + 히트영역
+  const showIdx=pts.length<=6?pts.map(p=>p.i):[0,Math.floor((pts.length-1)/2),pts.length-1];
+  pts.forEach(p=>{ if(showIdx.includes(p.i)){ const lb=mk("text",{x:X(p.i),y:H-8,"text-anchor":"middle",fill:cssv("--muted"),"font-size":11}); lb.textContent=String(p.label).slice(5); svg.appendChild(lb); }});
   const tip=$("#tip");
   pts.forEach(p=>{
     svg.appendChild(mk("circle",{cx:X(p.i),cy:Y(p.y),r:3.5,fill:cssv("--surface"),stroke:cssv("--series"),"stroke-width":2}));
-    const hit=mk("circle",{cx:X(p.i),cy:Y(p.y),r:14,fill:"transparent"});
-    hit.style.cursor="pointer";
-    hit.addEventListener("mousemove",ev=>{
-      tip.innerHTML=`<b>${esc(p.label)}</b><br>마킹 ${p.y} / ${p.tot} · 삭제 ${p.del}`;
-      tip.style.left=(ev.clientX+12)+"px"; tip.style.top=(ev.clientY-10)+"px"; tip.style.opacity=1;
-    });
+    const hit=mk("circle",{cx:X(p.i),cy:Y(p.y),r:14,fill:"transparent"}); hit.style.cursor="pointer";
+    hit.addEventListener("mousemove",ev=>{ tip.innerHTML=`<b>${esc(p.label)}</b><br>마킹 ${p.y} / ${p.tot} · 삭제 ${p.del}`; tip.style.left=(ev.clientX+12)+"px"; tip.style.top=(ev.clientY-10)+"px"; tip.style.opacity=1; });
     hit.addEventListener("mouseleave",()=>tip.style.opacity=0);
     svg.appendChild(hit);
   });
 }
 window.addEventListener("resize", ()=>{ if(BUNDLE) drawChart(); });
 
-// ── 자동 로그인 (이 탭에서 이미 인증했으면) ──
 (async ()=>{
   const pw=safeGet("luma_pw");
-  if(pw){
-    try{
-      await tryLogin(pw,false);
-      $("#gate").classList.add("hidden"); $("#app").classList.remove("hidden"); render();
-    }catch(e){ safeDel("luma_pw"); }
-  }
+  if(pw){ try{ await tryLogin(pw,false); $("#gate").classList.add("hidden"); $("#app").classList.remove("hidden"); render(); }catch(e){ safeDel("luma_pw"); } }
 })();
 </script>
 </body>
