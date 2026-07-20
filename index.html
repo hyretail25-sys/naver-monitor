@@ -114,7 +114,12 @@
     </div>
   </header>
   <main>
-    <div class="filters" id="prodtabs" style="margin-top:14px"></div>
+    <div class="filters" id="viewtabs" style="margin-top:14px">
+      <button data-v="status" class="on">제품 현황</button>
+      <button data-v="stats">통계 리포트</button>
+    </div>
+    <div class="filters" id="prodtabs"></div>
+    <div id="statusView">
     <div class="kpis" id="kpis"></div>
 
     <div class="card2 alert hidden" id="alertCard">
@@ -145,12 +150,50 @@
       </div>
       <div class="tbl-wrap"><table>
         <thead><tr>
-          <th>키워드</th><th class="num">검색량</th><th>카페</th><th>작업자</th><th>발행일</th>
+          <th>키워드</th><th class="num">검색량</th><th>카페</th><th>작업자</th><th>계정</th><th>발행일</th>
           <th>통검</th><th>카페탭</th><th>글 상태</th><th>링크</th>
         </tr></thead>
         <tbody id="kwbody"></tbody>
       </table></div>
     </div>
+    </div><!-- /statusView -->
+
+    <div id="statsView" class="hidden">
+      <div class="filters" id="statProd"></div>
+      <div class="kpis" id="statTotals"></div>
+
+      <div class="card2">
+        <h2>기간별 발행·노출</h2>
+        <p class="hint">발행일 기준 집계 · 노출률 = 노출 글 ÷ 발행 글 (통검은 검사 완료분만 판정됨)</p>
+        <div class="filters" id="statPeriod">
+          <button data-p="week" class="on">주간</button>
+          <button data-p="month">월간</button>
+        </div>
+        <div class="tbl-wrap"><table>
+          <thead><tr>
+            <th>기간</th><th class="num">발행</th>
+            <th class="num">통검 노출</th><th class="num">통검 노출률</th>
+            <th class="num">카페탭 노출</th><th class="num">카페탭 노출률</th>
+            <th class="num">미검사</th><th class="num">삭제됨</th>
+          </tr></thead>
+          <tbody id="statPeriodBody"></tbody>
+        </table></div>
+      </div>
+
+      <div class="card2">
+        <h2>작업자별 현황</h2>
+        <p class="hint">전체 기간 누적 · 계정은 작업자 행에 마우스를 올리면 표시</p>
+        <div class="tbl-wrap"><table>
+          <thead><tr>
+            <th>작업자</th><th class="num">발행</th>
+            <th class="num">통검 노출</th><th class="num">통검 노출률</th>
+            <th class="num">카페탭 노출</th><th class="num">카페탭 노출률</th>
+            <th class="num">미검사</th><th class="num">삭제됨</th>
+          </tr></thead>
+          <tbody id="statWriterBody"></tbody>
+        </table></div>
+      </div>
+    </div><!-- /statsView -->
   </main>
   <footer id="foot"></footer>
 </div>
@@ -219,7 +262,7 @@ async function switchProduct(p){
       $("#alertCard").classList.add("hidden");
       $("#chart").innerHTML = "";
       $("#kwhint").textContent = "";
-      $("#kwbody").innerHTML = `<tr><td colspan="9" class="empty">${esc(p)}: 아직 업로드된 데이터가 없습니다. (시트업로드.bat 실행 후 새로고침)</td></tr>`;
+      $("#kwbody").innerHTML = `<tr><td colspan="10" class="empty">${esc(p)}: 아직 업로드된 데이터가 없습니다. (시트업로드.bat 실행 후 새로고침)</td></tr>`;
       $("#foot").textContent = "";
       return;
     }
@@ -272,11 +315,11 @@ function buildRows(kws){
     const marked=kwChecked && k.foundNorms.length>0;
     const links=k.links||[];
     if(links.length===0){
-      out.push({kw:k.kw, vol:k.vol, cafe:"", writer:"", date:"", tab:false, marked:false, rank:"", active:"", url:"", pub:true, checked:kwChecked, lastChecked:k.lastChecked});
+      out.push({kw:k.kw, vol:k.vol, cafe:"", writer:"", account:"", date:"", tab:false, marked:false, rank:"", active:"", url:"", pub:true, checked:kwChecked, lastChecked:k.lastChecked});
     }else{
       links.forEach(l=>{
         const rowChecked = l.marked===true || l.marked===false;   // null=미검사
-        out.push({kw:k.kw, vol:k.vol, cafe:l.cafe, writer:l.writer||l.manager, date:l.date,
+        out.push({kw:k.kw, vol:k.vol, cafe:l.cafe, writer:l.writer||l.manager, account:l.account||"", date:l.date,
           marked:l.marked===true, checked:rowChecked, rank:l.rankSheet, active:l.active, hasLink:true,
           url:l.urlResolved||l.url, pub:false, kwMarked:marked, lastChecked:k.lastChecked});
       });
@@ -348,12 +391,13 @@ function renderKw(){
     <td class="num">${r.vol!=null?r.vol.toLocaleString():'<span class="dash">—</span>'}</td>
     <td class="cafe">${d(r.cafe)}</td>
     <td>${d(r.writer)}</td>
+    <td>${d(r.account)}</td>
     <td>${d(r.date)}</td>
     <td>${tkCell(r)}</td>
     <td class="num">${d(r.rank)}</td>
     <td>${statusCell(r)}</td>
     <td>${linkCell(r)}</td>
-  </tr>`).join("") : `<tr><td colspan="9" class="empty">해당 항목이 없습니다.</td></tr>`;
+  </tr>`).join("") : `<tr><td colspan="10" class="empty">해당 항목이 없습니다.</td></tr>`;
 }
 $("#kwfilters").addEventListener("click", e=>{
   const btn=e.target.closest("button"); if(!btn) return;
@@ -410,7 +454,158 @@ function drawChart(){
     svg.appendChild(hit);
   });
 }
-window.addEventListener("resize", ()=>{ if(BUNDLE) drawChart(); });
+window.addEventListener("resize", ()=>{ if(BUNDLE && VIEW==="status") drawChart(); });
+
+// ─── 통계 리포트 ───
+let VIEW="status", STAT_PROD="전체", STAT_PERIOD="week";
+
+async function setView(v){
+  VIEW=v;
+  [...$("#viewtabs").children].forEach(b=>b.classList.toggle("on", b.dataset.v===v));
+  $("#statusView").classList.toggle("hidden", v!=="status");
+  $("#statsView").classList.toggle("hidden", v!=="stats");
+  $("#prodtabs").classList.toggle("hidden", v!=="status");
+  if(v==="stats"){
+    $("#title").textContent="통계 리포트";
+    $("#updated").textContent="전 제품 합산 · 발행일 기준";
+    await loadAllProducts();
+    renderStats();
+  }else if(BUNDLE){
+    render();
+  }
+}
+$("#viewtabs").addEventListener("click", e=>{
+  const b=e.target.closest("button"); if(b && b.dataset.v!==VIEW) setView(b.dataset.v);
+});
+
+async function loadAllProducts(){
+  const pw=safeGet("luma_pw"); if(!pw) return;
+  await Promise.all(PRODUCTS.map(async p=>{
+    if(BUNDLES[p]) return;
+    try{ BUNDLES[p]=await loadProduct(p, pw); }catch(e){ /* 데이터 없는 제품은 건너뜀 */ }
+  }));
+}
+
+function parseDate(s){
+  s=String(s||"").trim(); if(!s) return null;
+  let m=s.match(/(\d{4})[.\-\/년]\s*(\d{1,2})[.\-\/월]\s*(\d{1,2})/);
+  if(m) return new Date(+m[1], +m[2]-1, +m[3]);
+  m=s.match(/^(\d{1,2})[.\-\/](\d{1,2})/);
+  if(m){
+    const now=new Date(); const y=now.getFullYear();
+    let d=new Date(y, +m[1]-1, +m[2]);
+    if(d.getTime()-now.getTime() > 40*86400000) d=new Date(y-1, +m[1]-1, +m[2]);  // 미래 40일 이상이면 작년 글
+    return isNaN(d) ? null : d;
+  }
+  return null;
+}
+function weekStart(d){ const x=new Date(d.getFullYear(),d.getMonth(),d.getDate()); x.setDate(x.getDate()-((x.getDay()+6)%7)); return x; }  // 월요일 시작
+function fmtMD(d){ return (d.getMonth()+1)+"/"+d.getDate(); }
+const pctS=(a,b)=> b ? Math.round(a/b*100)+"%" : '—';
+
+function statRows(){
+  const prods = STAT_PROD==="전체" ? PRODUCTS : [STAT_PROD];
+  const rows=[];
+  prods.forEach(p=>{
+    const b=BUNDLES[p]; if(!b || !b.latest) return;
+    (b.latest.keywords||[]).forEach(k=>{
+      (k.links||[]).forEach(l=>{
+        rows.push({
+          product:p, kw:k.kw,
+          writer:(l.writer||l.manager||"").trim(),
+          account:(l.account||"").trim(),
+          date:parseDate(l.date),
+          marked:l.marked===true,
+          checked:l.marked===true||l.marked===false,
+          cafeTab:!!String(l.rankSheet||"").trim(),
+          deleted:l.active==="삭제됨",
+        });
+      });
+    });
+  });
+  return rows;
+}
+
+function renderStats(){
+  // 제품 필터
+  $("#statProd").innerHTML=["전체",...PRODUCTS].map(p=>
+    `<button data-sp="${esc(p)}" class="${p===STAT_PROD?"on":""}">${esc(p)}</button>`).join("");
+  [...$("#statPeriod").children].forEach(b=>b.classList.toggle("on", b.dataset.p===STAT_PERIOD));
+
+  const rows=statRows();
+  const tot=rows.length,
+        mk=rows.filter(r=>r.marked).length,
+        cf=rows.filter(r=>r.cafeTab).length,
+        un=rows.filter(r=>!r.checked).length,
+        del=rows.filter(r=>r.deleted).length;
+  $("#statTotals").innerHTML=[
+    {label:"총 발행 글", val:tot, sub:STAT_PROD==="전체"?"전 제품 합산":STAT_PROD},
+    {label:"통검 노출", val:mk, sub:`노출률 ${pctS(mk,tot)}`, cls:"good"},
+    {label:"카페탭 노출", val:cf, sub:`노출률 ${pctS(cf,tot)}`},
+    {label:"미검사", val:un, sub:"통검 검사 대기", cls:un?"warn":""},
+    {label:"삭제됨", val:del, sub:"주의 필요", cls:del?"crit":""},
+  ].map(k=>`<div class="kpi"><div class="label">${k.label}</div><div class="val ${k.cls||""}">${k.val.toLocaleString()}</div><div class="sub">${k.sub}</div></div>`).join("");
+
+  // 기간별 집계
+  const groups=new Map();
+  rows.forEach(r=>{
+    let key,label,sort;
+    if(!r.date){ key="?"; label="날짜 미상"; sort=-1; }
+    else if(STAT_PERIOD==="week"){
+      const ws=weekStart(r.date), we=new Date(ws); we.setDate(we.getDate()+6);
+      key=ws.getTime(); label=`${fmtMD(ws)} ~ ${fmtMD(we)}`; sort=ws.getTime();
+    }else{
+      key=r.date.getFullYear()+"-"+String(r.date.getMonth()+1).padStart(2,"0");
+      label=key; sort=new Date(r.date.getFullYear(), r.date.getMonth(), 1).getTime();
+    }
+    if(!groups.has(key)) groups.set(key,{label,sort,rows:[]});
+    groups.get(key).rows.push(r);
+  });
+  const glist=[...groups.values()].sort((a,b)=>b.sort-a.sort).slice(0, STAT_PERIOD==="week"?16:14);
+  $("#statPeriodBody").innerHTML = glist.length ? glist.map(g=>{
+    const t=g.rows.length,
+          m=g.rows.filter(r=>r.marked).length,
+          c=g.rows.filter(r=>r.cafeTab).length,
+          u=g.rows.filter(r=>!r.checked).length,
+          dd=g.rows.filter(r=>r.deleted).length;
+    return `<tr><td>${esc(g.label)}</td><td class="num">${t}</td>
+      <td class="num">${m}</td><td class="num">${pctS(m,t)}</td>
+      <td class="num">${c}</td><td class="num">${pctS(c,t)}</td>
+      <td class="num">${u||'<span class="dash">—</span>'}</td>
+      <td class="num">${dd||'<span class="dash">—</span>'}</td></tr>`;
+  }).join("") : `<tr><td colspan="8" class="empty">데이터 없음</td></tr>`;
+
+  // 작업자별 집계
+  const byW=new Map();
+  rows.forEach(r=>{
+    const w=r.writer||"(미기재)";
+    if(!byW.has(w)) byW.set(w,{rows:[],accounts:new Set()});
+    byW.get(w).rows.push(r);
+    if(r.account) byW.get(w).accounts.add(r.account);
+  });
+  const wlist=[...byW.entries()].sort((a,b)=>b[1].rows.length-a[1].rows.length);
+  $("#statWriterBody").innerHTML = wlist.length ? wlist.map(([w,g])=>{
+    const rs=g.rows, t=rs.length,
+          m=rs.filter(r=>r.marked).length,
+          c=rs.filter(r=>r.cafeTab).length,
+          u=rs.filter(r=>!r.checked).length,
+          dd=rs.filter(r=>r.deleted).length;
+    const accTitle=g.accounts.size?` title="계정: ${esc([...g.accounts].join(", "))}"`:"";
+    return `<tr><td${accTitle}>${esc(w)}</td><td class="num">${t}</td>
+      <td class="num">${m}</td><td class="num">${pctS(m,t)}</td>
+      <td class="num">${c}</td><td class="num">${pctS(c,t)}</td>
+      <td class="num">${u||'<span class="dash">—</span>'}</td>
+      <td class="num">${dd?`<span class="badge b-del">${dd}</span>`:'<span class="dash">—</span>'}</td></tr>`;
+  }).join("") : `<tr><td colspan="8" class="empty">데이터 없음</td></tr>`;
+}
+$("#statProd").addEventListener("click", e=>{
+  const b=e.target.closest("button"); if(!b) return;
+  STAT_PROD=b.dataset.sp; renderStats();
+});
+$("#statPeriod").addEventListener("click", e=>{
+  const b=e.target.closest("button"); if(!b) return;
+  STAT_PERIOD=b.dataset.p; renderStats();
+});
 
 (async ()=>{
   const pw=safeGet("luma_pw");
