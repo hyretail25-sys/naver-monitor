@@ -272,13 +272,13 @@ function buildRows(kws){
     const marked=kwChecked && k.foundNorms.length>0;
     const links=k.links||[];
     if(links.length===0){
-      out.push({kw:k.kw, vol:k.vol, cafe:"", writer:"", date:"", tab:false, marked:false, rank:"", active:"", url:"", pub:true, checked:kwChecked});
+      out.push({kw:k.kw, vol:k.vol, cafe:"", writer:"", date:"", tab:false, marked:false, rank:"", active:"", url:"", pub:true, checked:kwChecked, lastChecked:k.lastChecked});
     }else{
       links.forEach(l=>{
         const rowChecked = l.marked===true || l.marked===false;   // null=미검사
         out.push({kw:k.kw, vol:k.vol, cafe:l.cafe, writer:l.writer||l.manager, date:l.date,
           marked:l.marked===true, checked:rowChecked, rank:l.rankSheet, active:l.active, hasLink:true,
-          url:l.urlResolved||l.url, pub:false, kwMarked:marked});
+          url:l.urlResolved||l.url, pub:false, kwMarked:marked, lastChecked:k.lastChecked});
       });
     }
   });
@@ -327,7 +327,8 @@ function statusCell(r){
 function tkCell(r){
   if(r.pub) return '<span class="badge b-pub">미발행</span>';
   if(!r.checked) return '<span class="badge b-unk">미검사</span>';
-  return r.marked ? '<span class="badge b-mark">마킹</span>' : '<span class="badge b-none">노마킹</span>';
+  const t = r.lastChecked ? ` title="검사: ${esc(r.lastChecked)}"` : "";
+  return r.marked ? `<span class="badge b-mark"${t}>마킹</span>` : `<span class="badge b-none"${t}>노마킹</span>`;
 }
 function linkCell(r){ return r.url ? `<a href="${esc(r.url)}" target="_blank" rel="noopener">🔗 열기</a>` : '<span class="dash">—</span>'; }
 
