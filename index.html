@@ -149,15 +149,6 @@
     <div id="statusView">
     <div class="kpis" id="kpis"></div>
 
-    <div class="card2 alert hidden" id="alertCard">
-      <h2 style="color:var(--critical)">⚠ 주의가 필요한 글</h2>
-      <p class="hint">삭제되어 통검 유입이 안 되는 글입니다. (회원전용은 통검 클릭으로 열람 가능해 제외)</p>
-      <div class="tbl-wrap"><table>
-        <thead><tr><th>키워드</th><th>카페</th><th>상태</th><th>링크</th></tr></thead>
-        <tbody id="alertBody"></tbody>
-      </table></div>
-    </div>
-
     <div class="card2">
       <h2>마킹 수 추이</h2>
       <p class="hint">실행 회차별로 통합검색에 노출(마킹)된 키워드 수입니다.</p>
@@ -315,7 +306,6 @@ async function switchProduct(p){
       $("#title").textContent = p + " · 상위노출 모니터링";
       $("#updated").textContent = "";
       $("#kpis").innerHTML = "";
-      $("#alertCard").classList.add("hidden");
       $("#chart").innerHTML = "";
       $("#kwhint").textContent = "";
       $("#kwbody").innerHTML = `<tr><td colspan="10" class="empty">${esc(p)}: 아직 업로드된 데이터가 없습니다. (시트업로드.bat 실행 후 새로고침)</td></tr>`;
@@ -413,7 +403,7 @@ function render(){
   $("#kwhint").textContent=`총 ${total}개 키워드 · 마킹 ${marked} · 노마킹 ${noMark} · 미검사 ${unchecked} · 미발행 ${pub}`;
   $("#foot").textContent=`데이터는 암호화 저장됩니다 · ${b.product||PRODUCT} · 최근 이력 ${(b.history||[]).length}회`;
 
-  renderKw(); renderAlert(); drawChart();
+  renderKw(); drawChart();
 }
 
 const BADGE={"활성":"b-good","삭제됨":"b-del","회원전용":"b-mem","미확인":"b-unk"};
@@ -461,14 +451,6 @@ $("#kwfilters").addEventListener("click", e=>{
   renderKw();
 });
 
-function renderAlert(){
-  const bad=ROWS.filter(r=>r.active==="삭제됨");
-  if(!bad.length){ $("#alertCard").classList.add("hidden"); return; }
-  $("#alertCard").classList.remove("hidden");
-  $("#alertBody").innerHTML=bad.map(r=>`<tr>
-    <td class="kw">${esc(r.kw)}</td><td class="cafe">${d(r.cafe)}</td>
-    <td>${statusCell(r)}</td><td>${linkCell(r)}</td></tr>`).join("");
-}
 
 function cssv(n){ return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
 function drawChart(){
