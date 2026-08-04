@@ -543,6 +543,8 @@ function parseDate(s){
 function weekStart(d){ const x=new Date(d.getFullYear(),d.getMonth(),d.getDate()); x.setDate(x.getDate()-((x.getDay()+6)%7)); return x; }  // 월요일 시작
 function fmtMD(d){ return (d.getMonth()+1)+"/"+d.getDate(); }
 const pctS=(a,b)=> b ? Math.round(a/b*100)+"%" : '—';
+// 카페탭 J열: 순위 숫자(1~50)가 있으면 노출, "-"·"X"·빈칸은 미노출
+function isRankExposed(v){ const m=String(v==null?"":v).trim().match(/^(\d{1,2})$/); return !!m && +m[1]>=1 && +m[1]<=50; }
 
 let RANGE={preset:"all", from:null, to:null};   // 통계 기간 필터
 
@@ -574,7 +576,7 @@ function statRows(){
           rank:(l.rankSheet||"").toString().trim(),
           marked:l.marked===true,
           checked:l.marked===true||l.marked===false,
-          cafeTab:!!String(l.rankSheet||"").trim(),
+          cafeTab:isRankExposed(l.rankSheet),
           deleted:l.active==="삭제됨",
         });
       });
